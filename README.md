@@ -69,16 +69,30 @@ export interface IDataProduct {
 type TProductInfo = Pick<IProduct, 'title' | 'price'>;
 ```
 
-Интерфейс для работы с корзиной и формой
+Интерфейс для работы с корзиной
 
 ```
 export interface IBasket {
-	items: IProduct[];
+    listProducts: IProduct[];
 	payment: TBasketPayment;
-	address: string;
-	email: string;
-	phone: string;
-    total: string | number;
+    getCounterToBasket: () => number;
+    getSummaProducts: () => number;
+    setSelectedСard(data: IProduct): void;
+    deleteSelectedСard(item: IProduct): void;
+    clearBasket(): void
+}
+```
+
+Интерфейс для работы с заказом из корзины
+
+```
+export interface IBasketOrder {
+    payment: string;
+    email: string;
+    phone: string;
+    address: string;
+    total: number;
+    items: string[];
 }
 ```
 
@@ -116,27 +130,22 @@ export interface IFormModel {
     checkValidateOrder(): boolean;
     checkValidateContacts(): boolean;
     orderLot(): object;
+    orderAddress(field: string, value: string): void
+    orderData(field: string, value: string): void
 } 
 ```
 
 Ошибки формы
 
 ```
-export type FormErrors = Partial<Record<keyof IBasket, string>>;
-```
-
-Интерфейс для работы с корзиной
-
-```
-export interface IBasketModel {
-    listProducts: IProduct[];
-    getCounterToBasket: () => number;
-    getSummaProducts: () => number;
-    setSelectedСard(data: IProduct): void;
-    deleteSelectedСard(item: IProduct): void;
-    clearBasket(): void
+export interface IOrderForms extends IFormModel {
+    errors: string[];
 }
+
+
+export type FormErrors = Partial<Record<keyof IOrderForms, string>>;
 ```
+
 
 ## Архитектура приложения
 
