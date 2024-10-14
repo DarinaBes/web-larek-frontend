@@ -1,9 +1,9 @@
 // Интерфейс для работы с карточкой товара
 export interface IProduct {
 	id: string;
-	description: string;
 	image: string;
 	title: string;
+    text: string;
 	category: string;
 	price: number | null;
 }
