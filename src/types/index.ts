@@ -3,18 +3,24 @@ export interface IProduct {
 	id: string;
 	image: string;
 	title: string;
-    text: string;
+    description: string;
 	category: string;
 	price: number | null;
+    button: HTMLElement;
 }
 
 // Данные карточки, используемые в корзине
 type TProductInfo = Pick<IProduct, 'title' | 'price'>
 
+// слушатель для событий
+export interface IActions {
+    onClick: (event: MouseEvent) => void;
+}
+
 // Интерфейс для работы с карточками товаров
 export interface IDataProduct {
     items: IProduct[];
-    previewCard(item: IProduct): void ;
+    openCard(item: IProduct): void ;
     selectedCard: IProduct;
 }
 

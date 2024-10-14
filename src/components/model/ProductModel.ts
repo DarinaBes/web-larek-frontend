@@ -18,7 +18,7 @@ export class ProductModel implements IDataProduct {
         return this._items;
     }
 
-    previewCard(item: IProduct) {
+    openCard(item: IProduct) {
         this.selectedCard = item;
         this.events.emit('modal:open', item)
     }

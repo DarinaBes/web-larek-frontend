@@ -1,9 +1,5 @@
-import { IProduct } from "../../types";
+import { IProduct, IActions } from "../../types";
 import { IEvents } from "../base/events";
-
-interface IActions {
-    onClick: (event: MouseEvent) => void;
-}
 
 export interface ICard {
     render(data: IProduct): HTMLElement;
@@ -41,10 +37,10 @@ export class Card implements ICard {
         }
     }
 
-    set category(value: string | null) {
+    set category(value: string) {
         if (value) {
             this._categoryElement.textContent = value;
-            this._categoryElement.className = `card__category card__category_${this._colorElement[value] || 'other'}`;
+            this._categoryElement.className = `card__category card__category_${this._colorElement[value]}`;
         }
     }
     
@@ -54,6 +50,7 @@ export class Card implements ICard {
     }
 
     render(data: IProduct): HTMLElement {
+        this._categoryElement.textContent = data.category;
         this.category = data.category;
         this.setText(this._titleElement, data.title);
         this._imageElement.src = data.image;

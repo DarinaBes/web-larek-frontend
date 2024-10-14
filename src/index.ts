@@ -1,13 +1,13 @@
 import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
 import { CDN_URL, API_URL } from './utils/constants';
-import { ModelApi } from './components/model/ModelApi';
+import { ModelApi } from './components/Model/ModelApi';
 import { IFormModel, IProduct } from './types';
-import { ProductModel } from './components/model/ProductModel';
-import { Card } from './components/view/Card';
-import { Modal } from './components/view/Modal';
-import { BasketModel } from './components/model/BasketModel';
-import { FormModel } from './components/model/FormModel';
+import { ProductModel } from './components/Model/ProductModel';
+import { Card } from './components/View/Card';
+import { Modal } from './components/View/Modal';
+import { PreviewCard } from './components/View/PreviewCard';
+
 
 
 const events = new EventEmitter();
@@ -43,9 +43,15 @@ events.on('items:receive', () => {
 });
 
 // Получить id карточки по которой кликнули
-events.on('card:select', (item: IProduct) => { dataModel.previewCard(item) });
+events.on('card:select', (item: IProduct) => { dataModel.openCard(item) });
 
 // Открываем модальное окно карточки товара
+events.on('modal:open', (item: IProduct) => {
+    const cardPreview = new PreviewCard(cardPreviewTemplate, events);
+    modal.content = cardPreview.render(item);
+    modal.render();
+});
+
 
 
 api.getProductList()

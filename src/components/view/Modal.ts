@@ -67,6 +67,9 @@ export class Modal implements IModal {
     }
 
     render(): HTMLElement {
+        this._content;
+        this.open();
         return this.modalContainer;
+        
     }
 }
