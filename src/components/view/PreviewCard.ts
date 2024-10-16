@@ -1,22 +1,18 @@
-import { IActions, IProduct } from "../../types";
+import { IActions, IProduct, ICard } from "../../types";
 import { Card } from "./Card";
 import { IEvents } from "../base/events";
 
-export interface ICard {
-    render(data: IProduct): HTMLElement;
-}
-
 export class PreviewCard extends Card implements ICard {
-    _text: HTMLElement;
-    _button: HTMLElement;
+    text: HTMLElement;
+    button: HTMLElement;
 
     constructor(template: HTMLTemplateElement, protected events: IEvents, actions?: IActions) {
         super(template, events, actions);
-        this._text = this._cardElement.querySelector('.card__text') as HTMLElement;
-        this._button = this._cardElement.querySelector('.card__button') as HTMLElement;
+        this.text = this._cardElement.querySelector('.card__text') as HTMLElement;
+        this.button = this._cardElement.querySelector('.card__button') as HTMLElement;
 
-        this._button.addEventListener('click', () => {
-            if (this._button.hasAttribute('disabled')) {
+        this.button.addEventListener('click', () => {
+            if (this.button.hasAttribute('disabled')) {
                 return;
             }
             this.events.emit('card:inBasket');
@@ -25,22 +21,22 @@ export class PreviewCard extends Card implements ICard {
 
     private buttonState(price: number | string): void {
         if (price === null || price === 'Бесценно') {
-            this._button.setAttribute('disabled', 'true');
-            this._button.textContent = 'Не продается';
+            this.button.setAttribute('disabled', 'true');
+            this.button.textContent = 'Не продается';
         } else {
-            this._button.removeAttribute('disabled');
-            this._button.textContent = 'Купить';
+            this.button.removeAttribute('disabled');
+            this.button.textContent = 'Купить';
         }
     }
 
     render(data: IProduct): HTMLElement {
-        this._categoryElement.textContent = data.category;
-        this.category = data.category;
-        this.setText(this._titleElement, data.title);
+        this.categoryElement.textContent = data.category;
+        this.categoryCard = data.category;
         this._imageElement.src = data.image;
         this._imageElement.alt = data.title;
+        this.setText(this._titleElement, data.title);
         this.setText(this._priceElement, this.formatPrice(data.price));
-        this._text.textContent = data.description;
+        this.text.textContent = data.description;
         this.buttonState(data.price);
         return this._cardElement;
     }

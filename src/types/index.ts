@@ -69,7 +69,7 @@ export interface IOrderForms extends IFormModel {
 export type FormErrors = Partial<Record<keyof IOrderForms, string>>;
 
 // Интерфейс для работы с корзиной
-export interface IBasket {
+export interface IBasketModel {
     listProducts: IProduct[];
     getCounterToBasket: () => number;
     getSummaProducts: () => number;
@@ -78,3 +78,6 @@ export interface IBasket {
     clearBasket(): void
 }
 
+export interface ICard {
+    render(data: IProduct): HTMLElement;
+}

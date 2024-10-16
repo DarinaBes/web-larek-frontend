@@ -7,14 +7,14 @@ export interface IModal {
 }
 
 export class Modal implements IModal {
-    protected modalContainer: HTMLElement;
     protected _content: HTMLElement;
-    protected closeButton: HTMLButtonElement;
+    protected modalContainer: HTMLElement;
     protected _pageWrapper: HTMLElement;
-
+    protected closeButton: HTMLButtonElement;
+    
     constructor(modalContainer: HTMLElement, protected events: IEvents) {
         this.modalContainer = modalContainer;
-        this.closeButton = modalContainer.querySelector('.modal__close') as HTMLButtonElement; // явное указание типа
+        this.closeButton = modalContainer.querySelector('.modal__close') as HTMLButtonElement;
         this._content = modalContainer.querySelector('.modal__content') as HTMLElement;
         this._pageWrapper = document.querySelector('.page__wrapper') as HTMLElement;
         this.closeButton.addEventListener('click', this.close.bind(this));

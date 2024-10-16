@@ -1,36 +1,38 @@
-import { IProduct, IBasket } from "../../types";
+import { IProduct, IBasketModel } from "../../types";
 
-export class BasketModel implements IBasket {
-    private _listProducts: IProduct[];
+export class BasketModel implements IBasketModel {
+    listBasket: IProduct[];
 
     constructor() {
-        this._listProducts = [];
+        this.listBasket = [];
+    }
+
+    set listProducts(data: IProduct[]) {
+        this.listBasket = data;
     }
 
     get listProducts() {
-        return this._listProducts;
+        return this.listBasket;
     }
 
     getCounterToBasket() {
-        return this._listProducts.length;
+        return this.listBasket.length;
     }
 
     getSummaProducts() {
-        return this._listProducts.reduce((sum, product) => sum + product.price, 0);
+        return this.listBasket.reduce((sum, product) => sum + product.price, 0);
     }
 
     setSelectedСard(data: IProduct) {
-        this._listProducts.push(data);
+        this.listBasket.push(data);
     }
 
     deleteSelectedСard(item: IProduct) {
-        const index = this._listProducts.indexOf(item);
-        if (index >= 0) {
-            this._listProducts.splice(index, 1);
-        }
+        this.listBasket = this.listBasket.filter(product => product.id !== item.id);
     }
+    
 
     clearBasket() {
-        this._listProducts = [];
+        this.listBasket = [];
     }
 }

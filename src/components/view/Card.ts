@@ -1,17 +1,13 @@
-import { IProduct, IActions } from "../../types";
+import { IProduct, IActions, ICard } from "../../types";
 import { IEvents } from "../base/events";
-
-export interface ICard {
-    render(data: IProduct): HTMLElement;
-}
 
 export class Card implements ICard {
     protected _cardElement: HTMLElement;
-    protected _categoryElement: HTMLElement;
+    protected categoryElement: HTMLElement;
     protected _titleElement: HTMLElement;
     protected _imageElement: HTMLImageElement;
     protected _priceElement: HTMLElement;
-    protected _colorElement = <Record<string, string>>{
+    protected colorElement = <Record<string, string>>{
         "софт-скил": "soft",
         "хард-скил": "hard",
         "кнопка": "button",
@@ -21,7 +17,7 @@ export class Card implements ICard {
 
     constructor(template: HTMLTemplateElement, protected events: IEvents, actions?: IActions) {
         this._cardElement = template.content.querySelector('.card')!.cloneNode(true) as HTMLElement;
-        this._categoryElement = this._cardElement.querySelector('.card__category')!;
+        this.categoryElement = this._cardElement.querySelector('.card__category')!;
         this._titleElement = this._cardElement.querySelector('.card__title')!;
         this._imageElement = this._cardElement.querySelector('.card__image') as HTMLImageElement;
         this._priceElement = this._cardElement.querySelector('.card__price')!;
@@ -37,12 +33,13 @@ export class Card implements ICard {
         }
     }
 
-    set category(value: string) {
+    set categoryCard(value: string) {
         if (value) {
-            this._categoryElement.textContent = value;
-            this._categoryElement.className = `card__category card__category_${this._colorElement[value]}`;
+            this.categoryElement.textContent = value;
+            this.categoryElement.className = `card__category card__category_${this.colorElement[value]}`;
         }
     }
+    
     
 
     protected formatPrice(value: number | null): string {
@@ -50,11 +47,11 @@ export class Card implements ICard {
     }
 
     render(data: IProduct): HTMLElement {
-        this._categoryElement.textContent = data.category;
-        this.category = data.category;
-        this.setText(this._titleElement, data.title);
+        this.categoryElement.textContent = data.category;
+        this.categoryCard = data.category;
         this._imageElement.src = data.image;
         this._imageElement.alt = data.title;
+        this.setText(this._titleElement, data.title);
         this.setText(this._priceElement, this.formatPrice(data.price));
         return this._cardElement;
     }

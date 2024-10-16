@@ -7,7 +7,9 @@ import { ProductModel } from './components/Model/ProductModel';
 import { Card } from './components/View/Card';
 import { Modal } from './components/View/Modal';
 import { PreviewCard } from './components/View/PreviewCard';
-
+import { BasketModel } from './components/Model/BasketModel';
+import { Basket } from './components/View/Basket';
+import { BasketItem } from './components/View/BasketItem';
 
 
 const events = new EventEmitter();
@@ -30,6 +32,9 @@ const successTemplate = document.querySelector('#success') as HTMLTemplateElemen
 // Переиспользуемые части интерфейса
 const dataModel = new ProductModel(events);
 const modal = new Modal(document.querySelector('#modal-container') as HTMLTemplateElement, events);
+const basketModel = new BasketModel();
+const basket = new Basket(basketTemplate, events);
+
 
 // Выводим карточки на страницу
 events.on('items:receive', () => {
@@ -46,11 +51,55 @@ events.on('items:receive', () => {
 events.on('card:select', (item: IProduct) => { dataModel.openCard(item) });
 
 // Открываем модальное окно карточки товара
-events.on('modal:open', (item: IProduct) => {
+events.on('modal:open', (data: IProduct) => {
     const cardPreview = new PreviewCard(cardPreviewTemplate, events);
-    modal.content = cardPreview.render(item);
+    modal.content = cardPreview.render(data);
     modal.render();
 });
+
+// Открываем модальное окно корзины
+events.on('basket:open', () => {
+    basket.renderSumProducts(basketModel.getSummaProducts());
+    let i = 0;
+    const itemsList = basketModel.listProducts.map((item) => {
+        const basketItem = new BasketItem(cardBasketTemplate, events, { onClick: () => events.emit('card:delete', item) });
+        i += 1;
+        return basketItem.render(item, i);
+    });
+    basket.itemsList = itemsList;
+    modal.content = basket.render();
+    modal.render();
+});
+// Добавить карточку в корзину
+events.on('card:inBasket', () => {
+    basketModel.setSelectedСard(dataModel.selectedCard);
+    basket.renderBasketHeaderCounter(basketModel.getCounterToBasket()); 
+    modal.close();
+});
+
+// Удалить карточку из корзины
+events.on('card:delete', (item: IProduct) => {
+    basketModel.deleteSelectedСard(item);
+    // Обновляем счетчик
+    basket.renderBasketHeaderCounter(basketModel.getCounterToBasket());
+    // Обновляем сумму
+    basket.renderSumProducts(basketModel.getSummaProducts());
+    // Очищаем старые элементы корзины
+    basket.itemsList.forEach(item => {
+        item.remove();
+    });
+    // Создаем новый список элементов для рендеринга
+    basket.itemsList = basketModel.listBasket.map((currentItem, index) => {
+        const basketItem = new BasketItem(cardBasketTemplate, events, {
+            onClick: () => events.emit('card:delete', currentItem)
+        });
+        return basketItem.render(currentItem, index);
+    });
+    // Добавляем новые элементы в модальное окно
+    modal.content = basket.render(); 
+    modal.render();
+});
+
 
 
 
