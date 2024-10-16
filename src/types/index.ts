@@ -1,3 +1,4 @@
+
 // Интерфейс для работы с карточкой товара
 export interface IProduct {
 	id: string;
@@ -79,5 +80,5 @@ export interface IBasketModel {
 }
 
 export interface ICard {
-    render(data: IProduct): HTMLElement;
+    render(data: IProduct, itemSelected?: boolean): HTMLElement;
 }

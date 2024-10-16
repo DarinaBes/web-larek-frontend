@@ -10,7 +10,7 @@ import { PreviewCard } from './components/View/PreviewCard';
 import { BasketModel } from './components/Model/BasketModel';
 import { Basket } from './components/View/Basket';
 import { BasketItem } from './components/View/BasketItem';
-
+import { FormModel } from './components/Model/FormModel';
 
 const events = new EventEmitter();
 const api = new ModelApi(CDN_URL, API_URL);
@@ -35,9 +35,7 @@ const modal = new Modal(document.querySelector('#modal-container') as HTMLTempla
 const basketModel = new BasketModel();
 const basket = new Basket(basketTemplate, events);
 
-
-// Выводим карточки на страницу
-events.on('items:receive', () => {
+function renderCards() {
     const galleryElement = document.querySelector<HTMLElement>('.gallery');
     dataModel.items.forEach(item => {
         const card = new Card(cardCatalogTemplate, events, {
@@ -45,7 +43,9 @@ events.on('items:receive', () => {
         });
         galleryElement.append(card.render(item));
     });
-});
+}
+// Выводим карточки на страницу
+events.on('items:receive', renderCards);
 
 // Получить id карточки по которой кликнули
 events.on('card:select', (item: IProduct) => { dataModel.openCard(item) });
@@ -53,8 +53,11 @@ events.on('card:select', (item: IProduct) => { dataModel.openCard(item) });
 // Открываем модальное окно карточки товара
 events.on('modal:open', (data: IProduct) => {
     const cardPreview = new PreviewCard(cardPreviewTemplate, events);
-    modal.content = cardPreview.render(data);
-    modal.render();
+    if (data) {
+        const itemSelected = !!basketModel.listProducts.find(item => item.id === data.id)
+        modal.content = cardPreview.render(data, itemSelected);
+        modal.render();
+    }
 });
 
 // Открываем модальное окно корзины
@@ -66,7 +69,7 @@ events.on('basket:open', () => {
         i += 1;
         return basketItem.render(item, i);
     });
-    basket.itemsList = itemsList;
+    basket.items = itemsList;
     modal.content = basket.render();
     modal.render();
 });
@@ -75,21 +78,16 @@ events.on('card:inBasket', () => {
     basketModel.setSelectedСard(dataModel.selectedCard);
     basket.renderBasketHeaderCounter(basketModel.getCounterToBasket()); 
     modal.close();
+    renderCards()
 });
 
 // Удалить карточку из корзины
 events.on('card:delete', (item: IProduct) => {
     basketModel.deleteSelectedСard(item);
-    // Обновляем счетчик
     basket.renderBasketHeaderCounter(basketModel.getCounterToBasket());
-    // Обновляем сумму
     basket.renderSumProducts(basketModel.getSummaProducts());
-    // Очищаем старые элементы корзины
-    basket.itemsList.forEach(item => {
-        item.remove();
-    });
-    // Создаем новый список элементов для рендеринга
-    basket.itemsList = basketModel.listBasket.map((currentItem, index) => {
+    basketModel.deleteSelectedСard(item)// Очищаем старые элементы корзины
+    basket.items = basketModel.listBasket.map((currentItem, index) => {
         const basketItem = new BasketItem(cardBasketTemplate, events, {
             onClick: () => events.emit('card:delete', currentItem)
         });

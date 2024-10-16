@@ -19,7 +19,12 @@ export class PreviewCard extends Card implements ICard {
         });
     }
 
-    private buttonState(price: number | string): void {
+    private buttonState(price: number | string, itemSelected?: boolean): void {
+        if (itemSelected) {
+            this.button.setAttribute('disabled', 'true');
+            this.button.textContent = 'Уже добавлена';
+            return
+        }
         if (price === null || price === 'Бесценно') {
             this.button.setAttribute('disabled', 'true');
             this.button.textContent = 'Не продается';
@@ -29,7 +34,7 @@ export class PreviewCard extends Card implements ICard {
         }
     }
 
-    render(data: IProduct): HTMLElement {
+    render(data: IProduct, itemSelected?: boolean): HTMLElement {
         this.categoryElement.textContent = data.category;
         this.categoryCard = data.category;
         this._imageElement.src = data.image;
@@ -37,7 +42,7 @@ export class PreviewCard extends Card implements ICard {
         this.setText(this._titleElement, data.title);
         this.setText(this._priceElement, this.formatPrice(data.price));
         this.text.textContent = data.description;
-        this.buttonState(data.price);
+        this.buttonState(data.price, itemSelected);
         return this._cardElement;
     }
     

@@ -1,3 +1,4 @@
+import { createElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
 
 export interface IBasket {
@@ -34,15 +35,18 @@ export class Basket implements IBasket {
         this._basketHeaderButton.addEventListener('click', () => { this.events.emit('basket:open') });
         this._basketButton.addEventListener('click', () => { this.events.emit('order:open') });
 
-        this.itemsList = [];
+        this.items = [];
     }
 
-    set itemsList(items: HTMLElement[]) {
+    set items(items: HTMLElement[]) {
         if (items.length) {
-            this._basketList.append(...items);
+            this._basketList.replaceChildren(...items);
             this._basketButton.removeAttribute('disabled');
         } else {
             this._basketButton.setAttribute('disabled', 'disabled');
+            this._basketList.replaceChildren(createElement<HTMLParagraphElement>('p', {
+                textContent: 'Корзина пуста'
+            }));
         }
     }
     render() {

@@ -24,7 +24,10 @@ export class BasketModel implements IBasketModel {
     }
 
     setSelectedСard(data: IProduct) {
-        this.listBasket.push(data);
+        const existingCard = this.listBasket.find(card => card.id === data.id)
+        if (!existingCard) {
+            this.listBasket.push(data);
+        }
     }
 
     deleteSelectedСard(item: IProduct) {
