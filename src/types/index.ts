@@ -53,13 +53,9 @@ export interface IFormModel {
     email: string;
     phone: string;
     address: string;
-    total: number;
-    items: string[];
-    checkValidateOrder(): boolean;
-    checkValidateContacts(): boolean;
-    orderLot(): object;
-    orderAddress(field: string, value: string): void
+    checkValidate(): boolean;
     orderData(field: string, value: string): void
+    orderLot(): object;
 } 
 
 // Ошибки формы

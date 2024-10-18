@@ -1,16 +1,16 @@
 import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
 import { CDN_URL, API_URL } from './utils/constants';
-import { ModelApi } from './components/Model/ModelApi';
+import { ModelApi } from './components/model/ModelApi';
 import { IFormModel, IProduct } from './types';
-import { ProductModel } from './components/Model/ProductModel';
-import { Card } from './components/View/Card';
-import { Modal } from './components/View/Modal';
-import { PreviewCard } from './components/View/PreviewCard';
-import { BasketModel } from './components/Model/BasketModel';
-import { Basket } from './components/View/Basket';
-import { BasketItem } from './components/View/BasketItem';
-import { FormModel } from './components/Model/FormModel';
+import { ProductModel } from './components/model/ProductModel';
+import { Card } from './components/view/Card';
+import { Modal } from './components/view/Modal';
+import { PreviewCard } from './components/view/PreviewCard';
+import { BasketModel } from './components/model/BasketModel';
+import { Basket } from './components/view/Basket';
+import { BasketItem } from './components/view/BasketItem';
+import { FormModel } from './components/model/FormModel';
 
 const events = new EventEmitter();
 const api = new ModelApi(CDN_URL, API_URL);
