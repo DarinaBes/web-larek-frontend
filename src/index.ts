@@ -2,7 +2,7 @@ import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
 import { CDN_URL, API_URL } from './utils/constants';
 import { ModelApi } from './components/model/ModelApi';
-import { IFormModel, IProduct } from './types';
+import { IFormModel, IOrderForms, IProduct, TBasketPayment } from './types';
 import { ProductModel } from './components/model/ProductModel';
 import { Card } from './components/view/Card';
 import { Modal } from './components/view/Modal';
@@ -11,14 +11,17 @@ import { BasketModel } from './components/model/BasketModel';
 import { Basket } from './components/view/Basket';
 import { BasketItem } from './components/view/BasketItem';
 import { FormModel } from './components/model/FormModel';
+import { FormOrder } from './components/view/FormOrder';
+import { FormContacts } from './components/view/FormContacts';
+
 
 const events = new EventEmitter();
 const api = new ModelApi(CDN_URL, API_URL);
 
-// Чтобы мониторить все события, для отладки
-events.onAll(({ eventName, data }) => {
-    console.log(eventName, data);
-})
+// // Чтобы мониторить все события, для отладки
+// events.onAll(({ eventName, data }) => {
+//     console.log(eventName, data);
+// })
 
 // Все шаблоны
 const cardCatalogTemplate = document.querySelector('#card-catalog') as HTMLTemplateElement;
@@ -34,6 +37,9 @@ const dataModel = new ProductModel(events);
 const modal = new Modal(document.querySelector('#modal-container') as HTMLTemplateElement, events);
 const basketModel = new BasketModel();
 const basket = new Basket(basketTemplate, events);
+const formModel = new FormModel(events) as IFormModel;
+const order = new FormOrder(orderTemplate, events);
+const contacts = new FormContacts(contactsTemplate, events);
 
 function renderCards() {
     const galleryElement = document.querySelector<HTMLElement>('.gallery');
@@ -97,6 +103,50 @@ events.on('card:delete', (item: IProduct) => {
     modal.content = basket.render(); 
     modal.render();
 });
+// Открываем модальное окно Заказ с адресом
+events.on('order:open', () => {
+    modal.content = order.render();
+    modal.render();
+    formModel.items = basketModel.listBasket.map(item => item.id); 
+    events.on('order:payment', (button: HTMLButtonElement) => { 
+        order.paymentChoose = button.name
+        formModel.checkValidate()
+    })
+    events.on('order:change', (event: { field: string, value: string }) => { 
+        formModel[event.field] = event.value
+        formModel.checkValidate()
+    })
+});
+// events.on(`order:ready`, (data: { field: string, value: string }) => {
+//     formModel.orderData(data.field, data.value);
+// });
+events.on('form:error', (errors: Partial<IOrderForms>) => {
+    const { address, payment } = errors;
+    order.valid = !address && !payment;
+    order.formErr.textContent = Object.values({address, payment}).filter(i => !!i).join('; ');
+})
+// Открываем модальное окно Заказ с тел и почтой
+events.on('contacts:open', () => {
+    formModel.total = basketModel.getSummaProducts();
+    modal.content = contacts.render();
+    modal.render();
+    formModel.checkValidate()
+events.on('contacts:change', (event: { field: string, value: string }) => { 
+        formModel[event.field] = event.value
+        formModel.checkValidate()
+    })
+});
+// events.on(`order:ready`, (data: { field: string, value: string }) => {
+//     formModel.orderData(data.field, data.value);
+// });
+events.on('form:error', (errors: Partial<IOrderForms>) => {
+    const { email, phone } = errors;
+    contacts.valid = !email && !phone;
+    contacts.formErr.textContent = Object.values({ phone, email }).filter(i => !!i).join('; ');
+})
+// Открываем модальное окно Заказ удачно сформирован
+
+
 
 
 

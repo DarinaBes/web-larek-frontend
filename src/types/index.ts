@@ -10,8 +10,8 @@ export interface IProduct {
     button: HTMLElement;
 }
 
-// Данные карточки, используемые в корзине
-type TProductInfo = Pick<IProduct, 'title' | 'price'>
+// // Данные карточки, используемые в корзине
+// type TProductInfo = Pick<IProduct, 'title' | 'price'>
 
 // слушатель для событий
 export interface IActions {
@@ -49,10 +49,13 @@ export type TBasketStep = 'order' | 'contacts';
 
 // Интерфейс для работы с формами
 export interface IFormModel {
+    [key: string]: any
     payment: TBasketPayment;
     email: string;
     phone: string;
     address: string;
+    total: number;
+    items: string[];
     checkValidate(): boolean;
     orderData(field: string, value: string): void
     orderLot(): object;

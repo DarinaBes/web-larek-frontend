@@ -1,18 +1,23 @@
 import { IEvents } from '../base/events';
-import { IOrderForms, FormErrors, TBasketPayment } from '../../types/index';
+import { IFormModel, FormErrors, TBasketPayment } from '../../types/index';
 
-export class FormModel implements IOrderForms {
+export class FormModel implements IFormModel {
     payment: TBasketPayment;
     email: string;
     phone: string;
     address: string;
-    errors: string[] = [];
+    items: string[];
+    total: number;
+    formErrors: FormErrors = {};
+
 
     constructor(protected events: IEvents) {
         this.payment = 'cash';
         this.email = '';
         this.phone = '';
         this.address = '';
+        this.items = [];
+        this.total = 0;
     }
 
     orderData(field: string, value: string): void {
@@ -43,9 +48,9 @@ export class FormModel implements IOrderForms {
             this.phone = '+7' + this.phone.slice(1);
         }
 
-        this.errors = Object.values(errors);
-        this.events.emit('formErrors:change', errors);
-        return this.errors.length === 0;
+        this.formErrors = errors;
+        this.events.emit('form:error', this.formErrors);
+        return Object.keys(errors).length === 0;
     }
 
     orderLot() {
@@ -54,6 +59,8 @@ export class FormModel implements IOrderForms {
             email: this.email,
             phone: this.phone,
             address: this.address,
+            items: this.items,
+            total: this.total
         }
     }
 }
