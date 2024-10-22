@@ -53,10 +53,13 @@ export class Basket implements IBasket {
         this._basketTitle.textContent = 'Корзина';
         return this._basket;
     }
+    
     renderBasketHeaderCounter(value: number) {
-        this._basketHeaderCounter.textContent = String(value);
+        this._basketHeaderCounter.textContent = value.toString();
     }
+    
     renderSumProducts(sumAll: number) {
-        this._basketPrice.textContent = String(sumAll + ' синапсов');
+        this._basketPrice.textContent = `${sumAll} синапсов`;
     }
+    
 }

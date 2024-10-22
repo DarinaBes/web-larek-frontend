@@ -1,4 +1,3 @@
-
 // Интерфейс для работы с карточкой товара
 export interface IProduct {
 	id: string;
@@ -9,9 +8,6 @@ export interface IProduct {
 	price: number | null;
     button: HTMLElement;
 }
-
-// // Данные карточки, используемые в корзине
-// type TProductInfo = Pick<IProduct, 'title' | 'price'>
 
 // слушатель для событий
 export interface IActions {
@@ -41,11 +37,8 @@ export type TBasketPayment = 'cash' | 'card';
 // Результат заказа в корзине
 export interface IBasketResult {
     id: string;
-    total: string | number;
+    total: number;
 }
-
-// Типы для формы заказа, шаги
-export type TBasketStep = 'order' | 'contacts';
 
 // Интерфейс для работы с формами
 export interface IFormModel {
@@ -56,9 +49,6 @@ export interface IFormModel {
     address: string;
     total: number;
     items: string[];
-    checkValidate(): boolean;
-    orderData(field: string, value: string): void
-    orderLot(): object;
 } 
 
 // Ошибки формы
@@ -71,11 +61,6 @@ export type FormErrors = Partial<Record<keyof IOrderForms, string>>;
 // Интерфейс для работы с корзиной
 export interface IBasketModel {
     listProducts: IProduct[];
-    getCounterToBasket: () => number;
-    getSummaProducts: () => number;
-    setSelectedСard(data: IProduct): void;
-    deleteSelectedСard(item: IProduct): void;
-    clearBasket(): void
 }
 
 export interface ICard {

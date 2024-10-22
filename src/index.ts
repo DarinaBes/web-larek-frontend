@@ -2,7 +2,7 @@ import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
 import { CDN_URL, API_URL } from './utils/constants';
 import { ModelApi } from './components/model/ModelApi';
-import { IFormModel, IOrderForms, IProduct, TBasketPayment } from './types';
+import { IFormModel, IOrderForms, IProduct, IBasketOrder } from './types';
 import { ProductModel } from './components/model/ProductModel';
 import { Card } from './components/view/Card';
 import { Modal } from './components/view/Modal';
@@ -13,15 +13,10 @@ import { BasketItem } from './components/view/BasketItem';
 import { FormModel } from './components/model/FormModel';
 import { FormOrder } from './components/view/FormOrder';
 import { FormContacts } from './components/view/FormContacts';
-
+import { FormSuccess } from './components/view/FormSuccess';
 
 const events = new EventEmitter();
 const api = new ModelApi(CDN_URL, API_URL);
-
-// // Чтобы мониторить все события, для отладки
-// events.onAll(({ eventName, data }) => {
-//     console.log(eventName, data);
-// })
 
 // Все шаблоны
 const cardCatalogTemplate = document.querySelector('#card-catalog') as HTMLTemplateElement;
@@ -40,6 +35,7 @@ const basket = new Basket(basketTemplate, events);
 const formModel = new FormModel(events) as IFormModel;
 const order = new FormOrder(orderTemplate, events);
 const contacts = new FormContacts(contactsTemplate, events);
+const success = new FormSuccess(successTemplate, events);
 
 function renderCards() {
     const galleryElement = document.querySelector<HTMLElement>('.gallery');
@@ -65,7 +61,6 @@ events.on('modal:open', (data: IProduct) => {
         modal.render();
     }
 });
-
 // Открываем модальное окно корзины
 events.on('basket:open', () => {
     basket.renderSumProducts(basketModel.getSummaProducts());
@@ -86,7 +81,6 @@ events.on('card:inBasket', () => {
     modal.close();
     renderCards()
 });
-
 // Удалить карточку из корзины
 events.on('card:delete', (item: IProduct) => {
     basketModel.deleteSelectedСard(item);
@@ -117,13 +111,13 @@ events.on('order:open', () => {
         formModel.checkValidate()
     })
 });
-// events.on(`order:ready`, (data: { field: string, value: string }) => {
-//     formModel.orderData(data.field, data.value);
-// });
+events.on(`order:ready`, (data: { field: string, value: string }) => {
+    formModel.orderData(data.field, data.value);
+});
 events.on('form:error', (errors: Partial<IOrderForms>) => {
     const { address, payment } = errors;
     order.valid = !address && !payment;
-    order.formErr.textContent = Object.values({address, payment}).filter(i => !!i).join('; ');
+    order.formErr.textContent = Object.values({address, payment}).filter(i => !!i).join(' и ');
 })
 // Открываем модальное окно Заказ с тел и почтой
 events.on('contacts:open', () => {
@@ -136,23 +130,40 @@ events.on('contacts:change', (event: { field: string, value: string }) => {
         formModel.checkValidate()
     })
 });
-// events.on(`order:ready`, (data: { field: string, value: string }) => {
-//     formModel.orderData(data.field, data.value);
-// });
+events.on(`order:ready`, (data: { field: string, value: string }) => {
+    formModel.orderData(data.field, data.value);
+});
 events.on('form:error', (errors: Partial<IOrderForms>) => {
     const { email, phone } = errors;
     contacts.valid = !email && !phone;
-    contacts.formErr.textContent = Object.values({ phone, email }).filter(i => !!i).join('; ');
+    contacts.formErr.textContent = Object.values({ phone, email }).filter(i => !!i).join(' и ');
 })
 // Открываем модальное окно Заказ удачно сформирован
-
-
-
-
+events.on('success:open', () => {
+    const orderData: IBasketOrder = formModel.orderLot();
+    api.postOrder(orderData)
+        .then((data) => {
+            // console.log(data);
+            modal.content = success.render(basketModel.getSummaProducts());
+            basketModel.clear();
+            basket.renderBasketHeaderCounter(basketModel.getCounterToBasket());
+            modal.render();
+        })
+        .catch(err => {
+            console.error(err);
+            modal.content = err.render('Произошла ошибка при создании заказа. Пожалуйста, попробуйте еще раз.');
+            modal.render();
+        });
+        
+        
+});
+events.on('success:close', () => modal.close());
 
 
 api.getProductList()
 .then(function (data: IProduct[]) {
     dataModel.items = data;
 })
-.catch(error => console.log(error))
+.catch(err => {
+    console.error(err);
+});

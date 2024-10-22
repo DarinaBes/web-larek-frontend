@@ -35,7 +35,7 @@ export class BasketModel implements IBasketModel {
     }
     
 
-    clearBasket() {
+    clear() {
         this.listBasket = [];
     }
 }

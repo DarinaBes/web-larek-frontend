@@ -45,48 +45,38 @@ yarn build
 Карточка товара
 
 ```
-export interface IProduct {
+interface IProduct {
 	id: string;
-	description: string;
 	image: string;
 	title: string;
+    description: string;
 	category: string;
 	price: number | null;
+    button: HTMLElement;
 }
 ```
 Интерфейс для работы с карточками товаров
 
 ```
-export interface IDataProduct {
+interface IDataProduct {
     items: IProduct[];
-    previewCard: IProduct;
-    selectedСard(item: IProduct): void;
+    openCard(item: IProduct): void ;
+    selectedCard: IProduct;
 }
 ```
-Данные карточки, используемые в корзине
+
+Слушатель для событий
 
 ```
-type TProductInfo = Pick<IProduct, 'title' | 'price'>;
-```
-
-Интерфейс для работы с корзиной
-
-```
-export interface IBasket {
-    listProducts: IProduct[];
-	payment: TBasketPayment;
-    getCounterToBasket: () => number;
-    getSummaProducts: () => number;
-    setSelectedСard(data: IProduct): void;
-    deleteSelectedСard(item: IProduct): void;
-    clearBasket(): void
+interface IActions {
+    onClick: (event: MouseEvent) => void;
 }
 ```
 
 Интерфейс для работы с заказом из корзины
 
 ```
-export interface IBasketOrder {
+interface IBasketOrder {
     payment: string;
     email: string;
     phone: string;
@@ -96,54 +86,64 @@ export interface IBasketOrder {
 }
 ```
 
+Интерфейс для работы с заказом из корзины
+
+```
+interface IBasketOrder {
+    payment: string;
+    email: string;
+    phone: string;
+    address: string;
+    total: number;
+    items: string[];
+}
+```
+
+Интерфейс для работы с корзиной
+
+```
+interface IBasketModel {
+    listProducts: IProduct[];
+}
+```
+
 Данные для выбора оплаты
 
 ```
-export type TBasketPayment = 'cash' | 'card';
+type TBasketPayment = 'cash' | 'card';
 ```
 
 Результат заказа в корзине
 
 ```
-export interface IBasketResult {
+interface IBasketResult {
     id: string;
-    total: string | number;;
+    total: number;
 }
-```
-
-Типы для формы заказа, шаги
-
-```
-export type TBasketStep = 'order' | 'contacts';
 ```
 
 Интерфейс для работы с формами
 
 ```
-export interface IFormModel {
+interface IFormModel {
     payment: TBasketPayment;
     email: string;
     phone: string;
     address: string;
     total: number;
     items: string[];
-    checkValidateOrder(): boolean;
-    checkValidateContacts(): boolean;
-    orderLot(): object;
-    orderAddress(field: string, value: string): void
-    orderData(field: string, value: string): void
 } 
 ```
 
 Ошибки формы
 
 ```
-export interface IOrderForms extends IFormModel {
+interface IOrderForms extends IFormModel {
     errors: string[];
 }
 
 
-export type FormErrors = Partial<Record<keyof IOrderForms, string>>;
+type FormErrors = Partial<Record<keyof IOrderForms, string>>;
 ```
 
 
@@ -210,7 +210,7 @@ type TApiPostMethods = 'POST' | 'PUT' | 'DELETE'
 - deleteSelectedСard(item: IProduct): void; - удалить выбранную карточку из корзины
 - getSummaProducts: () => number; - подсчет сумма-итог в корзине
 - getCounterToBasket: () => number; - подсчет количество товаров в корзине
-- clearBasket(): void - очистка корзины
+- clear(): void - очистка корзины
 
 ### Классы представления view
 Все классы представления отвечают за отображение внутри контейнера (DOM-элемент) передаваемых в них данных.
