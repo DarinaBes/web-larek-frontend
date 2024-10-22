@@ -44,6 +44,7 @@
     height: 390px;
     aspect-ratio: 1;
     margin: 3.75rem;
+    filter: drop-shadow(2px 5px 8px grey);
   }
   &__title {
     font-size: $titleFontSize;

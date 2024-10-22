@@ -1,4 +1,4 @@
-import {  IDataProduct, IProduct } from "../../types";
+import { IDataProduct, IProduct } from "../../types";
 import { IEvents } from "../base/events";
 
 export class ProductModel implements IDataProduct {
