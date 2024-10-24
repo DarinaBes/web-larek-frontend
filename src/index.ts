@@ -14,6 +14,7 @@ import { FormModel } from './components/model/FormModel';
 import { FormOrder } from './components/view/FormOrder';
 import { FormContacts } from './components/view/FormContacts';
 import { FormSuccess } from './components/view/FormSuccess';
+import { Page } from './components/view/Page';
 
 const events = new EventEmitter();
 const api = new ModelApi(CDN_URL, API_URL);
@@ -36,17 +37,18 @@ const formModel = new FormModel(events) as IFormModel;
 const order = new FormOrder(orderTemplate, events);
 const contacts = new FormContacts(contactsTemplate, events);
 const success = new FormSuccess(successTemplate, events);
+const page = new Page(document.body, events);
 
+// Выводим карточки на страницу
 function renderCards() {
-    const galleryElement = document.querySelector<HTMLElement>('.gallery');
+    const gallery = document.querySelector<HTMLElement>('.gallery');
     dataModel.items.forEach(item => {
         const card = new Card(cardCatalogTemplate, events, {
             onClick: () => events.emit('card:select', item)
         });
-        galleryElement.append(card.render(item));
+        gallery.append(card.render(item));
     });
 }
-// Выводим карточки на страницу
 events.on('items:receive', renderCards);
 
 // Получить id карточки по которой кликнули
@@ -77,14 +79,14 @@ events.on('basket:open', () => {
 // Добавить карточку в корзину
 events.on('card:inBasket', () => {
     basketModel.setSelectedСard(dataModel.selectedCard);
-    basket.renderBasketHeaderCounter(basketModel.getCounterToBasket()); 
+    page.renderBasketHeaderCounter(basketModel.getCounterToBasket()); 
     modal.close();
     renderCards()
 });
 // Удалить карточку из корзины
 events.on('card:delete', (item: IProduct) => {
     basketModel.deleteSelectedСard(item);
-    basket.renderBasketHeaderCounter(basketModel.getCounterToBasket());
+    page.renderBasketHeaderCounter(basketModel.getCounterToBasket());
     basket.renderSumProducts(basketModel.getSummaProducts());
     basketModel.deleteSelectedСard(item)// Очищаем старые элементы корзины
     basket.items = basketModel.listBasket.map((currentItem, index) => {
@@ -146,7 +148,7 @@ events.on('success:open', () => {
             // console.log(data);
             modal.content = success.render(basketModel.getSummaProducts());
             basketModel.clear();
-            basket.renderBasketHeaderCounter(basketModel.getCounterToBasket());
+            page.renderBasketHeaderCounter(basketModel.getCounterToBasket());
             modal.render();
         })
         .catch(err => {
@@ -159,6 +161,16 @@ events.on('success:open', () => {
 });
 events.on('success:close', () => modal.close());
 
+
+//Блокируем прокрутку страницы если открыта модалка
+events.on('modal:open', () => {
+    page.locked = true;
+});
+
+//разблокируем
+events.on('modal:close', () => {
+    page.locked = false;
+});
 
 api.getProductList()
 .then(function (data: IProduct[]) {
