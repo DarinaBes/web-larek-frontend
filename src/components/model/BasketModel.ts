@@ -19,7 +19,7 @@ export class BasketModel implements IBasketModel {
         return this.listBasket.length;
     }
 
-    getSummaProducts() {
+    getSumProducts() {
         return this.listBasket.reduce((sum, product) => sum + product.price, 0);
     }
 

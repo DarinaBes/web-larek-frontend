@@ -20,6 +20,6 @@ export class ProductModel implements IDataProduct {
 
     openCard(item: IProduct) {
         this.selectedCard = item;
-        this.events.emit('modal:open', item)
+        this.events.emit('card:open', item)
     }
 }
