@@ -23,7 +23,7 @@ export class FormContacts {
 
         this.formContacts.addEventListener('submit', (event: Event) => {
             event.preventDefault();
-            this.events.emit('success:open');
+            this.events.emit('error:open');
         });
     }
 

@@ -23,7 +23,7 @@ export class BasketModel implements IBasketModel {
         return this.listBasket.reduce((sum, product) => sum + product.price, 0);
     }
 
-    setSelectedСard(data: IProduct) {
+    setSelectedCard(data: IProduct) {
         const existingCard = this.listBasket.find(card => card.id === data.id)
         if (!existingCard) {
             this.listBasket.push(data);

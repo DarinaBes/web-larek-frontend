@@ -57,7 +57,7 @@ events.on('card:select', (item: IProduct) => { dataModel.openCard(item) });
 events.on('card:open', (data: IProduct) => {
     const cardPreview = new PreviewCard(cardPreviewTemplate, events);
     if (data) {
-        const itemSelected = !!basketModel.listProducts.find(item => item.id === data.id)
+        const itemSelected = !!basketModel.listProducts.some(item => item.id === data.id)
         modal.content = cardPreview.render(data, itemSelected);
         modal.render();
     }
@@ -65,22 +65,27 @@ events.on('card:open', (data: IProduct) => {
 // Открываем модальное окно корзины
 events.on('basket:open', () => {
     basket.renderSumProducts(basketModel.getSumProducts());
-    let i = 0;
-    const itemsList = basketModel.listProducts.map((item) => {
-        const basketItem = new BasketItem(cardBasketTemplate, events, { onClick: () => events.emit('card:delete', item) });
-        i += 1;
-        return basketItem.render(item, i);
-    });
-    basket.items = itemsList;
+    updateBasketItems();
     modal.content = basket.render();
-    modal.render();
 });
+// Обновление счетчика на иконке корзины
 events.on('card:change', () => {
     page.basketHeaderCounter(basketModel.getCounterToBasket()); 
 });
+// Функция для обновления элементов корзины
+function updateBasketItems() {
+    basket.items = basketModel.listBasket.map((currentItem, index) => {
+        const basketItem = new BasketItem(cardBasketTemplate, events, {
+            onClick: () => events.emit('card:delete', currentItem)
+        });
+        return basketItem.render(currentItem, index);
+    });
+    modal.content = basket.render();
+    modal.render();
+}
 // Добавить карточку в корзину
 events.on('card:inBasket', () => {
-    basketModel.setSelectedСard(dataModel.selectedCard);
+    basketModel.setSelectedCard(dataModel.selectedCard);
     events.emit('card:change');
     modal.close();
 });
@@ -88,17 +93,8 @@ events.on('card:inBasket', () => {
 events.on('card:delete', (item: IProduct) => {
     basketModel.deleteSelectedСard(item);
     basket.renderSumProducts(basketModel.getSumProducts());
-    basketModel.deleteSelectedСard(item)// Очищаем старые элементы корзины
-    basket.items = basketModel.listBasket.map((currentItem, index) => {
-        const basketItem = new BasketItem(cardBasketTemplate, events, {
-            onClick: () => events.emit('card:delete', currentItem)
-        });
-        return basketItem.render(currentItem, index);
-    });
-    // Добавляем новые элементы в модальное окно
-    modal.content = basket.render(); 
-    modal.render();
-    events.emit('card:change')
+    updateBasketItems();
+    events.emit('card:change');
 });
 // Открываем модальное окно Заказ с адресом
 events.on('order:open', () => {
@@ -141,7 +137,7 @@ events.on('form:error', (errors: Partial<IOrderForms>) => {
     contacts.formErr.textContent = Object.values({ phone, email }).filter(i => !!i).join(' и ');
 });
 // Открываем модальное окно Заказ удачно сформирован
-events.on('success:open', () => {
+events.on('error:open', () => {
     formModel.items = basketModel.listBasket.map(item => item.id); 
     const orderData: IBasketOrder = formModel.orderLot();
     api.postOrder(orderData)
