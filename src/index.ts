@@ -52,7 +52,6 @@ function renderCards() {
 events.on('items:receive', renderCards);
 // Получить id карточки по которой кликнули
 events.on('card:select', (item: IProduct) => { dataModel.openCard(item) });
-
 // Открываем модальное окно карточки товара
 events.on('card:open', (data: IProduct) => {
     const cardPreview = new PreviewCard(cardPreviewTemplate, events);
@@ -65,12 +64,13 @@ events.on('card:open', (data: IProduct) => {
 // Открываем модальное окно корзины
 events.on('basket:open', () => {
     basket.renderSumProducts(basketModel.getSumProducts());
-    updateBasketItems();
     modal.content = basket.render();
+    modal.render();
 });
 // Обновление счетчика на иконке корзины
 events.on('card:change', () => {
-    page.basketHeaderCounter(basketModel.getCounterToBasket()); 
+    page.basketHeaderCounter(basketModel.getCounterToBasket());
+    updateBasketItems();
 });
 // Функция для обновления элементов корзины
 function updateBasketItems() {
@@ -78,10 +78,8 @@ function updateBasketItems() {
         const basketItem = new BasketItem(cardBasketTemplate, events, {
             onClick: () => events.emit('card:delete', currentItem)
         });
-        return basketItem.render(currentItem, index);
+        return basketItem.render(currentItem, index + 1);
     });
-    modal.content = basket.render();
-    modal.render();
 }
 // Добавить карточку в корзину
 events.on('card:inBasket', () => {
@@ -93,7 +91,6 @@ events.on('card:inBasket', () => {
 events.on('card:delete', (item: IProduct) => {
     basketModel.deleteSelectedСard(item);
     basket.renderSumProducts(basketModel.getSumProducts());
-    updateBasketItems();
     events.emit('card:change');
 });
 // Открываем модальное окно Заказ с адресом
